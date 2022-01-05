@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const CategoryController = require("../controllers/Category.controller");
+const upload = require("../utils/uploadImage")
 const {
   verifyToken,
   verifyTokenAndAuthorization,
@@ -8,12 +9,12 @@ const {
 router.get("/", CategoryController.getAllCategory);
 router.post(
   "/createCategory",
-  verifyTokenAndAdmin,
+  verifyTokenAndAdmin,upload,
   CategoryController.createCategory
 );
 router.put(
   "/updateCategory/:_id",
-  verifyTokenAndAdmin,
+  verifyTokenAndAdmin,upload,
   CategoryController.updateCategory
 );
 router.delete(

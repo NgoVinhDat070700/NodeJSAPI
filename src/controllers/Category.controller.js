@@ -1,7 +1,8 @@
 const Category = require("../models/Category.model");
 
 const createCategory = async (req, res) => {
-  const newCategory = new Category(req.body);
+  let image = req.file.filename
+  const newCategory = new Category({namecategory:req.body.namecategory,image:image,status:req.body.status});
   try {
     const savedCategory = await newCategory.save();
     res.status(200).json(savedCategory);
@@ -19,9 +20,10 @@ const getAllCategory = async (req, res) => {
 };
 const updateCategory = async (req, res) => {
   try {
+    let image = req.file.filename;
     const updateCat = await Category.findByIdAndUpdate(
       req.params._id,
-      req.body
+      {...req.body,image:image}
     );
     res.status(200).send(updateCat);
   } catch (err) {

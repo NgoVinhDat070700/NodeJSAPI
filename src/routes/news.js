@@ -1,27 +1,27 @@
 const router = require("express").Router();
-const ProductController = require("../controllers/Product.controller");
+const NewsController = require("../controllers/News.controller");
 const {
   verifyToken,
   verifyTokenAndAuthorization,
   verifyTokenAndAdmin,
 } = require("../controllers/verifyToken.controller");
 const upload = require('../utils/uploadImage')
-router.get("/", ProductController.getAllProducts);
+router.get("/", NewsController.getAllNews);
 router.post(
-  "/createProduct",upload,
+  "/createNews",upload,
   verifyTokenAndAdmin,
-  ProductController.createProduct
+  NewsController.createNews
 );
-router.get("/find/:_id", ProductController.findProduct);
+router.get("/find/:_id", NewsController.findNews);
 router.put(
-  "/updateProduct/:_id",upload,
+  "/updateNews/:_id",upload,
   verifyTokenAndAdmin,
-  ProductController.updateProduct
+  NewsController.updateNews
 );
 router.delete(
-  "/deleteProduct/:_id",
+  "/deleteNews/:_id",
   verifyTokenAndAdmin,
-  ProductController.deleteProduct
+  NewsController.deleteNews
 );
 
 

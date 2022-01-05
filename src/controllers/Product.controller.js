@@ -9,7 +9,8 @@ const getAllProducts = async (req, res) => {
   }
 };
 const createProduct = async (req, res) => {
-  const newProduct = new Product(req.body);
+  let image = req.file.filename
+  const newProduct = new Product({...req.body,image:image});
 
   try {
     const savedProduct = await newProduct.save();
@@ -20,10 +21,11 @@ const createProduct = async (req, res) => {
 };
 const updateProduct = async (req, res) => {
   try {
+    let image = req.file.filename;
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params._id,
       {
-        $set: req.body,
+        ...req.body,image:image
       },
       { new: true }
     );
@@ -50,6 +52,12 @@ const findProduct = async (req, res) => {
     res.status(500).json(err);
   }
 };
+// const findProductByCategory = async (req,res)=>{
+//   try{
+//     const productByCate = await Product.find(req.params.category_id)
+
+//   }
+// }
 module.exports = {
   getAllProducts: getAllProducts,
   createProduct: createProduct,
