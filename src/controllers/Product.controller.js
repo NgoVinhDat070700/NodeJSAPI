@@ -1,5 +1,6 @@
 const Product = require("../models/Product.model");
-
+const Sequelize = require("sequelize");
+const Op = Sequelize.Op;
 const getAllProducts = async (req, res) => {
   try {
     const allProduct = await Product.find().sort({ createdAt: -1 }).exec();
@@ -9,12 +10,12 @@ const getAllProducts = async (req, res) => {
   }
 };
 const createProduct = async (req, res) => {
-  let image = req.file.filename
-  const newProduct = new Product({...req.body,image:image});
+  let image = req.file.filename;
+  const newProduct = new Product({ ...req.body, image: image });
 
   try {
     const savedProduct = await newProduct.save();
-    res.status(200).json(savedProduct);
+    res.status(200).json({message:'thêm thành công',savedProduct});
   } catch (err) {
     res.status(500).json(err);
   }
@@ -25,20 +26,21 @@ const updateProduct = async (req, res) => {
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params._id,
       {
-        ...req.body,image:image
+        ...req.body,
+        image: image,
       },
       { new: true }
     );
-    res.status(200).json(updatedProduct);
+    res.status(200).json({message:"Sửa thành công",updatedProduct});
   } catch (err) {
-    res.status(500).json(err);
+    res.status(400).json(err);
   }
 };
 
 const deleteProduct = async (req, res) => {
   try {
-    await Product.findByIdAndDelete(req.params._id);
-    res.status(200).json("Product has been deleted...");
+    const deletePr = await Product.findByIdAndDelete(req.params._id);
+    res.status(200).json({message:"Product has been deleted...",deletePr});
   } catch (err) {
     res.status(500).json(err);
   }
@@ -52,16 +54,25 @@ const findProduct = async (req, res) => {
     res.status(500).json(err);
   }
 };
-// const findProductByCategory = async (req,res)=>{
-//   try{
-//     const productByCate = await Product.find(req.params.category_id)
 
-//   }
-// }
+const searchProduct = async (req, res) => {
+  try {
+    const nameproduct = req.query.nameproduct;
+    console.log("nameproduct",nameproduct)
+    const search = await Product.find({
+      nameproduct:{$regex:nameproduct,$options:'si'}
+    })
+    console.log("search",search)
+    res.status(200).json(search);
+  } catch (err) {
+    res.status(400).json(err);
+  }
+};
 module.exports = {
   getAllProducts: getAllProducts,
   createProduct: createProduct,
   updateProduct: updateProduct,
   deleteProduct: deleteProduct,
   findProduct: findProduct,
+  searchProduct: searchProduct,
 };

@@ -20,8 +20,8 @@ const updateUser = async (req,res)=>{
 }
 const deleteUser = async (req, res) => {
     try {
-      await User.findByIdAndDelete(req.params._id);
-      res.status(200).json("User has been deleted...");
+      const deleteUs = await User.findByIdAndDelete(req.params._id);
+      res.status(200).json({message:"User has been deleted...",deleteUs});
     } catch (err) {
       res.status(500).json(err);
     }
@@ -29,7 +29,7 @@ const deleteUser = async (req, res) => {
 
 const findUser = async (req, res) => {
     try {
-      const user = await User.findById(req.params.id);
+      const user = await User.findById(req.params._id);
       const { password, ...others } = user._doc;
       res.status(200).json(others);
     } catch (err) {
@@ -48,5 +48,17 @@ const getAllUser = async (req, res) => {
       res.status(500).json(err);
     }
   }
-
-module.exports = {getAllUser:getAllUser,updateUser:updateUser,findUser:findUser,deleteUser:deleteUser}
+  const searchUser = async (req, res) => {
+    try {
+      const email = req.query.email;
+      console.log("email",email)
+      const search = await User.find({
+        email:{$regex:email,$options:'si'}
+      })
+      console.log("search",search)
+      res.status(200).json(search);
+    } catch (err) {
+      res.status(400).json(err);
+    }
+  };
+module.exports = {getAllUser:getAllUser,updateUser:updateUser,findUser:findUser,deleteUser:deleteUser,searchUser:searchUser}

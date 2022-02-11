@@ -9,7 +9,7 @@ const ProductSchema = new mongoose.Schema(
         image:{type:String,required:true},
         price:{type:Number,required:true},
         desc:{type:String,required:true},
-        status:{type:String,enum:["Còn","Hết"] ,default:"Còn"},
+        status:{type:String,default:"Còn"},
     }
     
 )

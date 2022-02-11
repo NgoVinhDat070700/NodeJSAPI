@@ -23,6 +23,7 @@ router.delete(
   verifyTokenAndAdmin,
   NewsController.deleteNews
 );
+router.get('/search',NewsController.searchNews)
 
 
 module.exports = router;

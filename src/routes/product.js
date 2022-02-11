@@ -23,6 +23,7 @@ router.delete(
   verifyTokenAndAdmin,
   ProductController.deleteProduct
 );
+router.get('/search',ProductController.searchProduct)
 
 
 module.exports = router;

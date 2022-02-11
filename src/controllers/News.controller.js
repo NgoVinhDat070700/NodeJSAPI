@@ -13,7 +13,7 @@ const createNews = async (req, res) => {
   const newNews = new News({ ...req.body, image: image });
   try {
     const saveNews = await newNews.save();
-    res.status(200).json(saveNews);
+    res.status(200).json({message:"Thêm thành công",saveNews});
   } catch (error) {
     res.status(400).json(err);
   }
@@ -22,15 +22,15 @@ const updateNews = async (req, res) => {
   try {
     let image = req.file.filename;
     const udNews = await News.findByIdAndUpdate(req.params._id, {...req.body,image:image});
-    res.status(200).json(udNews);
+    res.status(200).json({message:'Sửa thành công',udNews});
   } catch (error) {
     res.status(400).json(error);
   }
 };
 const deleteNews = async (req, res) => {
   try {
-    await News.findByIdAndDelete(req.params._id);
-    res.status(200).json("News has been deleted...");
+    const deleteNew = await News.findByIdAndDelete(req.params._id);
+    res.status(200).json({message:"News has been deleted...",deleteNew});
   } catch (err) {
     res.status(400).json(err);
   }
@@ -43,10 +43,24 @@ const findNews = async (req, res) => {
     res.status(400).json(err);
   }
 };
+const searchNews = async (req, res) => {
+  try {
+    const title = req.query.title;
+    console.log("title",title)
+    const search = await News.find({
+      title:{$regex:title,$options:'si'}
+    })
+    console.log("search",search)
+    res.status(200).json(search);
+  } catch (err) {
+    res.status(400).json(err);
+  }
+};
 module.exports = {
   getAllNews: getAllNews,
   createNews: createNews,
   updateNews: updateNews,
   findNews: findNews,
   deleteNews: deleteNews,
+  searchNews:searchNews
 };

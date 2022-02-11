@@ -10,6 +10,7 @@ router.get('/',verifyTokenAndAdmin,UserController.getAllUser)
 router.put('/updateUser/:_id',verifyTokenAndAuthorization,UserController.updateUser)
 router.delete('/deleteUser/:_id',verifyTokenAndAdmin,UserController.deleteUser)
 router.get('/find/:_id',verifyTokenAndAdmin,UserController.findUser)
+router.get('/search',UserController.searchUser)
 router.post("/register", AuthController.register);
 router.post("/login", AuthController.login);
 module.exports = router;
