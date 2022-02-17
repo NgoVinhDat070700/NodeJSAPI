@@ -24,6 +24,6 @@ router.delete(
   ProductController.deleteProduct
 );
 router.get('/search',ProductController.searchProduct)
-
+router.get('/search_category',ProductController.searchProductByCate)
 
 module.exports = router;

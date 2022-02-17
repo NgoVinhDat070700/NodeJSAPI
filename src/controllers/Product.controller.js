@@ -68,6 +68,19 @@ const searchProduct = async (req, res) => {
     res.status(400).json(err);
   }
 };
+const searchProductByCate = async (req, res) => {
+  try {
+    const category_id = req.query.category_id;
+    console.log("category_id",category_id)
+    const search = await Product.find({
+      category_id:{$regex:category_id,$options:'si'}
+    })
+    console.log("search",search)
+    res.status(200).json(search);
+  } catch (err) {
+    res.status(400).json(err);
+  }
+};
 module.exports = {
   getAllProducts: getAllProducts,
   createProduct: createProduct,
@@ -75,4 +88,5 @@ module.exports = {
   deleteProduct: deleteProduct,
   findProduct: findProduct,
   searchProduct: searchProduct,
+  searchProductByCate:searchProductByCate
 };

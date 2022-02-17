@@ -4,9 +4,9 @@ const createOrder = async (req, res) => {
   const newOrder = new Order(req.body);
   try {
     const saveOrder = await newOrder.save();
-    res.status(200).json(saveOrder);
+    res.status(200).json({message:'Thanh toán thành công',saveOrder});
   } catch (error) {
-    res.status(500).json(error);
+    res.status(500).json({message:'Thanh toán thất bại',error});
   }
 };
 const updateOrder = async (req, res) => {

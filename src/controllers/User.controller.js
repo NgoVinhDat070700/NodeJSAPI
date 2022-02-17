@@ -13,6 +13,7 @@ const updateUser = async (req,res)=>{
             },
             {new:true}
         )
+        res.status(200).json({message:'Update success',update})
     }
     catch (err){
         res.status(500).json(err)
