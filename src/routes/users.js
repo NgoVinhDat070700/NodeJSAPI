@@ -6,9 +6,9 @@ const {
     verifyTokenAndAuthorization,
     verifyTokenAndAdmin,
   } = require("../controllers/verifyToken.controller");
-router.get('/',verifyTokenAndAdmin,UserController.getAllUser)
-router.put('/updateUser/:_id',verifyTokenAndAuthorization,UserController.updateUser)
-router.delete('/deleteUser/:_id',verifyTokenAndAdmin,UserController.deleteUser)
+router.get('/',UserController.getAllUser)
+router.put('/:_id',verifyTokenAndAuthorization,UserController.updateUser)
+router.delete('/:_id',verifyTokenAndAdmin,UserController.deleteUser)
 router.get('/find/:_id',verifyTokenAndAdmin,UserController.findUser)
 router.get('/search',UserController.searchUser)
 router.post("/register", AuthController.register);

@@ -8,7 +8,7 @@ const OrderSchema = new mongoose.Schema(
         productId: {
           type: String,
         },
-        quantity: {
+        qty: {
           type: Number,
           default: 1,
         },
@@ -17,7 +17,7 @@ const OrderSchema = new mongoose.Schema(
     amount: { type: Number, required: true },
     address: { type: String, required: true },
     phone:{type:String},
-    status: { type: String, default: "pending" },
+    status: { type: String, default: "Unpaid" },
   },
   { timestamps: true }
 );

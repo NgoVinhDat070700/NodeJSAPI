@@ -8,18 +8,18 @@ const {
 const upload = require('../utils/uploadImage')
 router.get("/", ProductController.getAllProducts);
 router.post(
-  "/createProduct",upload,
+  "/",upload,
   verifyTokenAndAdmin,
   ProductController.createProduct
 );
 router.get("/find/:_id", ProductController.findProduct);
 router.put(
-  "/updateProduct/:_id",upload,
+  "/:_id",upload,
   verifyTokenAndAdmin,
   ProductController.updateProduct
 );
 router.delete(
-  "/deleteProduct/:_id",
+  "/:_id",
   verifyTokenAndAdmin,
   ProductController.deleteProduct
 );

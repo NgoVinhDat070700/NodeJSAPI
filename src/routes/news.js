@@ -8,18 +8,18 @@ const {
 const upload = require('../utils/uploadImage')
 router.get("/", NewsController.getAllNews);
 router.post(
-  "/createNews",upload,
+  "/",upload,
   verifyTokenAndAdmin,
   NewsController.createNews
 );
 router.get("/find/:_id", NewsController.findNews);
 router.put(
-  "/updateNews/:_id",upload,
+  "/:_id",upload,
   verifyTokenAndAdmin,
   NewsController.updateNews
 );
 router.delete(
-  "/deleteNews/:_id",
+  "/:_id",
   verifyTokenAndAdmin,
   NewsController.deleteNews
 );
