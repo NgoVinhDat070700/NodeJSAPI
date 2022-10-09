@@ -3,9 +3,8 @@ const FacebookStrategy = require("passport-facebook").Strategy;
 const passport = require("passport");
 const AuthModel = require("./models/Auth.model");
 
-const GOOGLE_CLIENT_ID =
-  "22804827553-0po070v7v6ebr4im50md4st6bh5lgcdm.apps.googleusercontent.com";
-const GOOGLE_CLIENT_SECRET = "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";
+const GOOGLE_CLIENT_ID = process.env.GGCLIENT
+const GOOGLE_CLIENT_SECRET = process.env.GGCLIENT_SECRET
 
 FACEBOOK_APP_ID = "your id";
 FACEBOOK_APP_SECRET = "your id";
