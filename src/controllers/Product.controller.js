@@ -1,17 +1,30 @@
 const Product = require("../models/Product.model");
 const Sequelize = require("sequelize");
-const Op = Sequelize.Op;
+const mongoose = require('mongoose');
 const getAllProducts = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * pageSize;
+  const total = await Product.countDocuments({});
+  const totalPages =  Math.ceil(total / pageSize)
+  if (page > totalPages) {
+    return res.status(404).json({
+      status: "fail",
+      message: "No page found",
+    });
+  }
   try {
-    const allProduct = await Product.find().sort({ createdAt: -1 }).exec();
-    res.status(200).send(allProduct);
+    const nameproduct = req.query.nameproduct
+    const allProduct = await Product.find(nameproduct ?{
+      nameproduct:{$regex:nameproduct,$options:'si'}
+    }:{}).populate('category_id').limit(pageSize).skip(skip).sort({ createdAt: -1 }).exec();
+    res.status(200).send({allProduct, total,totalPages});
   } catch (err) {
     res.status(500).send(err);
   }
 };
 const createProduct = async (req, res) => {
-  let image = req.file.filename;
-  const newProduct = new Product({ ...req.body, image: image });
+  const newProduct = new Product({ ...req.body });
 
   try {
     const savedProduct = await newProduct.save();
@@ -22,12 +35,10 @@ const createProduct = async (req, res) => {
 };
 const updateProduct = async (req, res) => {
   try {
-    let image = req.file.filename;
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params._id,
       {
-        ...req.body,
-        image: image,
+        ...req.body
       },
       { new: true }
     );
@@ -40,7 +51,7 @@ const updateProduct = async (req, res) => {
 const deleteProduct = async (req, res) => {
   try {
     const deletePr = await Product.findByIdAndDelete(req.params._id);
-    res.status(200).json({message:"Product has been deleted...",deletePr});
+    res.status(200).json({message:"Product has been deleted...",deletePr,success:true});
   } catch (err) {
     res.status(500).json(err);
   }
@@ -58,12 +69,10 @@ const findProduct = async (req, res) => {
 const searchProduct = async (req, res) => {
   try {
     const nameproduct = req.query.nameproduct;
-    console.log("nameproduct",nameproduct)
-    const search = await Product.find({
+    const allProduct = await Product.find({
       nameproduct:{$regex:nameproduct,$options:'si'}
     })
-    console.log("search",search)
-    res.status(200).json(search);
+    res.status(200).send({allProduct});
   } catch (err) {
     res.status(400).json(err);
   }
@@ -71,12 +80,9 @@ const searchProduct = async (req, res) => {
 const searchProductByCate = async (req, res) => {
   try {
     const category_id = req.query.category_id;
-    console.log("category_id",category_id)
-    const search = await Product.find({
-      category_id:{$regex:category_id,$options:'si'}
-    })
-    console.log("search",search)
-    res.status(200).json(search);
+    console.log(category_id)
+    const allProduct = await Product.aggregate([{ $match: { category_id: mongoose.Types.ObjectId(category_id) } }]);
+    res.status(200).send({allProduct});
   } catch (err) {
     res.status(400).json(err);
   }

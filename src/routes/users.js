@@ -9,8 +9,10 @@ const {
 router.get('/',UserController.getAllUser)
 router.put('/:_id',verifyTokenAndAuthorization,UserController.updateUser)
 router.delete('/:_id',verifyTokenAndAdmin,UserController.deleteUser)
-router.get('/find/:_id',verifyTokenAndAdmin,UserController.findUser)
+router.get('/find/:_id',UserController.findUser)
 router.get('/search',UserController.searchUser)
+router.post("/refresh", AuthController.refresh)
+router.post("/logout", AuthController.logout);
 router.post("/register", AuthController.register);
 router.post("/login", AuthController.login);
 module.exports = router;

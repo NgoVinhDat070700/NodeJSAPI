@@ -3,7 +3,7 @@ const UserSchema = new mongoose.Schema(
   {
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    password: { type: String },
     isAdmin: {
       type: Boolean,
       default: false,
@@ -13,6 +13,17 @@ const UserSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
+    facebook: {
+      uid: String,
+      token: String,
+      email: { type: String, trim: true}
+      
+    },
+    google: {
+      uid: String,
+      token: String,
+      email: { type: String, trim: true}
+    }
   },
   { timestamps: true }
 );

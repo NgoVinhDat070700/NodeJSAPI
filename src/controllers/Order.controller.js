@@ -32,9 +32,22 @@ const deleteOrder = async (req, res) => {
   }
 };
 const getAll = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * pageSize;
+  const total = await Order.countDocuments({});
+  const totalPages =  Math.ceil(total / pageSize)
+  if (page > totalPages) {
+    return res.status(404).json({
+      status: "fail",
+      message: "No page found",
+    });
+  }
   try {
-    const orders = await Order.find();
-    res.status(200).json(orders);
+    const phone = req.query.phone
+    const orders = await Order.find(phone ?{
+      phone:{$regex:phone,$options:'si'}}:{}).populate('userId').limit(pageSize).skip(skip).sort({ createdAt: -1 }).exec();
+    res.status(200).json({orders, total, totalPages});
   } catch (err) {
     res.status(500).json(err);
   }

@@ -39,12 +39,20 @@ const findUser = async (req, res) => {
   }
 
 const getAllUser = async (req, res) => {
-    const query = req.query.new;
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * pageSize;
+    const total = await User.countDocuments({});
+    const totalPages =  Math.ceil(total / pageSize)
+    if (page > totalPages) {
+      return res.status(404).json({
+        status: "fail",
+        message: "No page found",
+      });
+    }
     try {
-      const users = query
-        ? await User.find().sort({ _id: -1 }).limit(5)
-        : await User.find();
-      res.status(200).json(users);
+      const users = await User.find().limit(pageSize).skip(skip).sort({ createdAt: -1 }).exec();
+      res.status(200).send({users,total,totalPages});
     } catch (err) {
       res.status(500).json(err);
     }

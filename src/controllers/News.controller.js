@@ -21,7 +21,7 @@ const createNews = async (req, res) => {
 const updateNews = async (req, res) => {
   try {
     let image = req.file.filename;
-    const udNews = await News.findByIdAndUpdate(req.params._id, {...req.body,image:image});
+    const udNews = await News.findByIdAndUpdate(req.params._id, {...req.body});
     res.status(200).json({message:'Sửa thành công',udNews});
   } catch (error) {
     res.status(400).json(error);

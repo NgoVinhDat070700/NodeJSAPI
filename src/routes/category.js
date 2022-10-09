@@ -8,17 +8,17 @@ const {
 } = require("../controllers/verifyToken.controller");
 router.get("/", CategoryController.getAllCategory);
 router.post(
-  "/createCategory",
+  "/",
   verifyTokenAndAdmin,upload,
   CategoryController.createCategory
 );
 router.put(
-  "/updateCategory/:_id",
+  "/:_id",
   verifyTokenAndAdmin,upload,
   CategoryController.updateCategory
 );
 router.delete(
-  "/deleteCategory/:_id",
+  "/:_id",
   verifyTokenAndAdmin,
   CategoryController.deleteCategory
 );
