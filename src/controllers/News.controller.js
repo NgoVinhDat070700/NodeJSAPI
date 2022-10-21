@@ -1,16 +1,26 @@
 const News = require("../models/News.model");
 
 const getAllNews = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * pageSize;
+  const total = await News.countDocuments({});
+  const totalPages =  Math.ceil(total / pageSize)
+  if (page > totalPages) {
+    return res.status(404).json({
+      status: "fail",
+      message: "No page found",
+    });
+  }
   try {
-    const allNews = await News.find().sort({ createdAt: -1 }).exec();
-    res.status(200).send(allNews);
+    const allNews = await News.find({}).populate('category_id').limit(pageSize).skip(skip).sort({ createdAt: -1 }).exec()
+    res.status(200).send({allNews , total, totalPages});
   } catch (err) {
     res.status(400).send(err);
   }
 };
 const createNews = async (req, res) => {
-  let image = req.file.filename;
-  const newNews = new News({ ...req.body, image: image });
+  const newNews = new News({ ...req.body });
   try {
     const saveNews = await newNews.save();
     res.status(200).json({message:"Thêm thành công",saveNews});
@@ -20,7 +30,6 @@ const createNews = async (req, res) => {
 };
 const updateNews = async (req, res) => {
   try {
-    let image = req.file.filename;
     const udNews = await News.findByIdAndUpdate(req.params._id, {...req.body});
     res.status(200).json({message:'Sửa thành công',udNews});
   } catch (error) {
