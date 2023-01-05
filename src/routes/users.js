@@ -1,6 +1,7 @@
 const router = require("express").Router();
-const AuthController = require("../controllers/Auth.controller");
+const { authCheck, adminCheck } = require("../controllers/Auth.controller");
 const UserController = require("../controllers/User.controller");
+const { currentUser, createOrUpdateUser } = require("../controllers/User.controller");
 const {
     verifyToken,
     verifyTokenAndAuthorization,
@@ -11,8 +12,7 @@ router.put('/:_id',verifyTokenAndAuthorization,UserController.updateUser)
 router.delete('/:_id',verifyTokenAndAdmin,UserController.deleteUser)
 router.get('/find/:_id',UserController.findUser)
 router.get('/search',UserController.searchUser)
-router.post("/refresh", AuthController.refresh)
-router.post("/logout", AuthController.logout);
-router.post("/register", AuthController.register);
-router.post("/login", AuthController.login);
+router.post("/create-or-update-user", authCheck, createOrUpdateUser);
+router.post("/current-user", authCheck, currentUser);
+router.post("/current-admin", authCheck, adminCheck, currentUser);
 module.exports = router;

@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const { authCheck, adminCheck } = require("../controllers/Auth.controller");
 const ProductController = require("../controllers/Product.controller");
 const {
   verifyToken,
@@ -9,18 +10,18 @@ const upload = require('../utils/uploadImage')
 router.get("/", ProductController.getAllProducts);
 router.post(
   "/",
-  verifyTokenAndAdmin,
+  authCheck,adminCheck,
   ProductController.createProduct
 );
 router.get("/find/:_id", ProductController.findProduct);
 router.put(
   "/:_id",
-  verifyTokenAndAdmin,
+  authCheck,adminCheck,
   ProductController.updateProduct
 );
 router.delete(
   "/:_id",
-  verifyTokenAndAdmin,
+  authCheck,adminCheck,
   ProductController.deleteProduct
 );
 router.get('/search',ProductController.searchProduct)
