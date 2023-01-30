@@ -6,12 +6,14 @@ const routerCategory = require("./src/routes/category");
 const routerProduct = require("./src/routes/product");
 const routerNews = require("./src/routes/news");
 const routerOrder = require("./src/routes/order");
+const routerAnalytics = require("./src/routes/analytics");
 const app = express();
 const cors = require("cors");
 require("dotenv").config();
+const http = require("http").createServer(app);
 const POST = 5000;
 app.use(bodyParser.json());
-const connectDb = require("./src/config/connectDb");
+const connectDb = require("./src/config/connectDB");
 const upload = require("./src/utils/uploadImage");
 // const authRoute = require('./src/auth/auth')
 var passport = require("passport");
@@ -26,6 +28,7 @@ app.use("/api/category", routerCategory);
 app.use("/api/products", routerProduct);
 app.use("/api/news", routerNews);
 app.use("/api/order", routerOrder);
+app.use("/api/analytics", routerAnalytics);
 app.use("/api/upload",upload,(req,res)=>{
   res.json({
     success:1,
@@ -52,6 +55,7 @@ app.options('*', cors())
 //   res.send(req.user);
 // })
 
-app.listen(POST, () =>
+
+http.listen(POST, () =>
   console.log(`Server running on port:http://localhost:${POST}`)
 );

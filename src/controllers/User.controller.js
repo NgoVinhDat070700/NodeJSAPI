@@ -1,17 +1,9 @@
 const User = require("../models/Auth.model");
 const updateUser = async (req,res)=>{
-    if(req.body.password){
-        req.body.password = CryptoJS.AES.encrypt(
-            req.body.password,process.env.PASS
-        ).toString()
-    }
     try{
         const update = await User.findByIdAndUpdate(
             req.params._id,
-            {
-                $set:req.body,
-            },
-            {new:true}
+            {...req.body}
         )
         res.status(200).json({message:'Update success',update})
     }

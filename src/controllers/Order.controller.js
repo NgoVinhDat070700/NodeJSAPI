@@ -1,7 +1,10 @@
+const dayjs = require("dayjs");
+const AuthModel = require("../models/Auth.model");
 const Order = require("../models/Order.model");
-const stripe = require("stripe")(process.env.STRIPE_SECRET || "sk_test_");
+const { getDateFormat, checkIsBeforeDate } = require("../utils/utils");
+const stripe = require("stripe")(process.env.STRIPE_SECRET || "sk_test_51MO0gNDt84DSaMCktxQeLHO7EPnbhFqzpI30xCpRJySoFwmBMwntxB2JwjW7V83booqrCsY9Mdziyg0Z5VYvRSzX00EJ2B0sq9");
 const createOrder = async (req, res) => {
-  const newOrder = new Order(req.body);
+  const newOrder = new Order({...req.body, orderStatus: { value: "PROCESSING", name: "Đơn đang được xử lý" },});
   try {
     const saveOrder = await newOrder.save();
     res.status(200).json({message:'Thanh toán thành công',saveOrder});
@@ -55,7 +58,7 @@ const getAll = async (req, res) => {
 const getUserOrder = async (req, res) => {
   try {
     const orders = await Order.find({ userId: req.params.userId });
-    res.status(200).json(orders);
+    res.status(200).json({orders});
   } catch (err) {
     res.status(500).json(err);
   }
@@ -100,19 +103,24 @@ const incomeMonthly = async (req, res) => {
 };
 
 const processPayment = async (req, res) => {
+  console.log(req.body.data)
   try {
+    const amount = req.body.data
     const paymentIntent = await stripe.paymentIntents.create({
-      currency: "usd",
+      amount:amount,
+      currency: "vnd",
       automatic_payment_methods: {
         enabled: true,
       },
       metadata: { integration_check: "accept_a_payment" },
     });
+    console.log('abc')
     res.status(200).json({
       success: true,
       client_secret: paymentIntent.client_secret,
     });
   } catch (err) {
+    console.log('err')
     res.status(err?.status || 400).json({ success: false, err: err.message });
   }
 }
@@ -139,6 +147,169 @@ const refundPayment = async (req, res) => {
     res.status(err?.status || 400).json({ success: false, err: err.message });
   }
 }
+
+const getInComeStats = async (req, res) => {
+  let { begin, end, orderStatus } = req.query;
+
+  let filter = {};
+  begin = getDateFormat(begin);
+  end = getDateFormat(end);
+
+  if (!checkIsBeforeDate(begin, end)) end = null;
+  if (begin && end) {
+    filter.updatedAt = {
+      $gte: begin,
+      $lte: end,
+    };
+  } else if (end) {
+    filter.updatedAt = { $lte: end };
+  } else if (begin) {
+    filter.updatedAt = { $gte: begin };
+  }
+  if (orderStatus) {
+    filter["orderStatus.value"] = { $in: orderStatus.split(",") };
+  }
+
+  try {
+    let data = await Order.aggregate([
+      {
+        $match: filter,
+      },
+      {
+        $project: {
+          orderShippingPrice: "$shippingPrice",
+          orderTotalPrice: "$totalPrice",
+          date: {
+            $dateToString: { format: "%Y-%m-%d", date: "$updatedAt" },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$date",
+          orderShippingPrice: { $sum: "$orderShippingPrice" },
+          orderTotalPrice: { $sum: "$orderTotalPrice" },
+          total: { $sum: 1 },
+        },
+      },
+      { $sort: { date: 1 } },
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data,
+      range: [filter.updatedAt["$gte"], filter.updatedAt["$lte"]],
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, err: err.message });
+  }
+}
+
+const getUsersStats = async (req, res) => {
+  let { begin, end } = req.query;
+
+  let filter = {};
+  begin = getDateFormat(begin);
+  end = getDateFormat(end);
+  if (!checkIsBeforeDate(begin, end)) end = null;
+
+  if (begin && end) {
+    filter.createdAt = {
+      $gte: begin,
+      $lte: end,
+    };
+  } else if (end) {
+    filter.createdAt = { $lte: end };
+  } else if (begin) {
+    filter.createdAt = { $gte: begin };
+  } else {
+    filter.createdAt = { $gte: dayjs().subtract(1, "month").toDate() };
+  }
+
+  try {
+    const data = await AuthModel.aggregate([
+      { $match: filter },
+      {
+        $project: {
+          date: {
+            $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$date",
+          total: { $sum: 1 },
+        },
+      },
+      { $sort: { date: 1 } },
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: data,
+      range: [filter.createdAt["$gte"], filter.createdAt["$lte"]],
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, err: err.message });
+  }
+};
+
+const getStatusStats = async (req, res) => {
+  let { begin, end, orderStatus } = req.query;
+
+  let filter = {};
+  begin = getDateFormat(begin);
+  end = getDateFormat(end);
+  if (!checkIsBeforeDate(begin, end)) end = null;
+
+  if (begin && end) {
+    filter.updatedAt = {
+      $gte: begin,
+      $lte: end,
+    };
+  } else if (end) {
+    filter.updatedAt = { $lte: end };
+  } else if (begin) {
+    filter.updatedAt = { $gte: begin };
+  } else {
+    filter.updatedAt = { $gte: dayjs().subtract(1, "month").toDate() };
+  }
+  if (orderStatus) {
+    filter["orderStatus.value"] = { $in: orderStatus.split(",") };
+  }
+
+  try {
+    let data = await Order.aggregate([
+      {
+        $match: filter,
+      },
+      {
+        $project: {
+          orderStatus: "$orderStatus.value",
+          date: {
+            $dateToString: { format: "%Y-%m-%d", date: "$updatedAt" },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$orderStatus",
+          total: { $sum: 1 },
+        },
+      },
+      { $sort: { date: 1 } },
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data,
+      range: [filter.updatedAt["$gte"], filter.updatedAt["$lte"]],
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, err: err.message });
+  }
+};
 module.exports = {
   createOrder: createOrder,
   updateOrder: updateOrder,
@@ -146,4 +317,9 @@ module.exports = {
   getAll: getAll,
   getUserOrder: getUserOrder,
   incomeMonthly: incomeMonthly,
+  processPayment:processPayment,
+  refundPayment:refundPayment,
+  getInComeStats:getInComeStats,
+  getUsersStats: getUsersStats,
+  getStatusStats: getStatusStats
 };

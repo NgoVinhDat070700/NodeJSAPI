@@ -19,9 +19,18 @@ const OrderSchema = new mongoose.Schema(
     fullname:{type: String, required: true, trim: true},
     email: {type: String, required: true, trim: true},
     amount: { type: Number, required: true },
+    totalPrice: {type: Number, default: 0},
+    shippingPrice: {
+      type: Number,
+      default: 0,
+    },
+    paymentMethods: {type: String, default: "Thanh toán khi nhận hàng"},
     address: { type: String, required: true },
     phone:{type:String},
-    status: { type: String, default: "Unpaid" },
+    orderStatus: {
+      value: { type: String, default: "PROCESSING" },
+      name: { type: String, required: true },
+    },
   },
   { timestamps: true }
 );
